@@ -1,127 +1,146 @@
-StayNest Pro Backend
-Project Overview
-StayNest Pro is a hotel, resort, and room booking management platform built using FastAPI and MySQL. The system provides secure REST APIs for customer management, hotel onboarding, room management, bookings, payments, analytics, subscriptions, administration, and hotel operations.
+StayNest Pro - Hotel, Resort & Room Booking Management Platform
+A comprehensive hotel, resort, and room booking management backend built using FastAPI, MySQL, SQLAlchemy ORM, JWT Authentication, and Alembic.
 
-This project is a backend-only implementation and exposes APIs through Swagger UI and OpenAPI documentation.
+The platform provides secure APIs for authentication, hotel management, room management, reservations, payments, analytics, administration, AI-powered services, loyalty systems, subscriptions, and operational workflows.
 
-Technology Stack
-FastAPI
-Python 3.8+
-MySQL
-SQLAlchemy ORM
-Alembic
-Pydantic
-JWT Authentication
-bcrypt / Argon2 Password Hashing
-Stripe Payment Integration
-Swagger UI
-Postman
-Pytest
-Features
-Authentication & Authorization
+1. Technologies Used
+Backend Framework: FastAPI
+Programming Language: Python
+Database: MySQL
+ORM: SQLAlchemy
+Authentication: JWT Access & Refresh Tokens
+Database Migration: Alembic
+Validation: Pydantic
+API Documentation: Swagger UI / OpenAPI
+API Testing: Postman
+Automated Testing: Pytest
+Payment Gateway: Stripe (Test Mode)
+Configuration: Environment Variables (.env)
+2. Features
+Authentication & RBAC
 User Registration
-Login
-JWT Access Tokens
-JWT Refresh Tokens
-Role-Based Access Control (RBAC)
+Login & Logout
+JWT Authentication
+Refresh Tokens
 Password Reset
-Email Verification
-User Roles
+Role-Based Access Control
+Supported Roles:
+
 CUSTOMER
 HOTEL_OWNER
 HOTEL_STAFF
 ADMIN
+Customer Management
+Customer Profiles
+Travel Preferences
+Profile Updates
+Profile Image Support
 Hotel Management
 Hotel Registration
 Hotel Verification
-Hotel Profile Management
-Hotel Amenities
-Hotel Gallery
 Hotel Moderation
+Hotel Profiles
+Hotel Amenities
+Hotel Gallery Management
+Hotel Search & Filters
 Room Management
 Room CRUD Operations
-Room Types
+Room Types Management
 Room Availability
+Capacity & Pricing Validation
 Dynamic Pricing
-Booking System
+Reservation Management
 Room Booking
-Guest Management
-Booking Management
-Check-In / Check-Out
+Reservation Calendar
 Booking History
-Payments
-Stripe Integration
-Payment Tracking
-Invoices
-Refund Processing
-Subscription Billing
+Guest Management
+Check-In Management
+Check-Out Management
+Payment Management
+Stripe Checkout Integration
+Payment Records
+Invoice Generation
+Refund Management
+Settlement Management
+Financial Reconciliation
 Customer Features
-Wishlist
 Reviews & Ratings
-Loyalty & Rewards
+Hotel Wishlist
 Notifications
 Messaging
-Analytics
+Loyalty & Rewards
+AI Services
+Hotel Recommendations
+AI Travel Assistant
+AI Customer Support Chatbot
+Analytics & Reporting
 Revenue Analytics
 Occupancy Analytics
 Customer Analytics
 Business Intelligence
 Dashboard APIs
+Export Reports
 Security
 Audit Logs
-Security Logs
+Security Monitoring
 Fraud Detection
-Role-Based Restrictions
-Project Structure
-staynest-pro/
-|
+Protected Endpoints
+JWT-Based Authorization
+3. Project Structure
+StayNestPro/
+│
 ├── app/
 │   ├── api/
 │   ├── core/
-│   ├── database/
+│   ├── db/
 │   ├── models/
 │   ├── schemas/
 │   ├── services/
-│   ├── utils/
 │   └── main.py
-|
+│
 ├── alembic/
 │   └── versions/
-|
+│
 ├── tests/
-|
-├── uploads/
-|
-├── docs/
-|
-├── .env.example
+│
+├── media/
+│
+├── Postman/
+│
+├── Screenshots/
+│
+├── README.md
 ├── requirements.txt
 ├── alembic.ini
-├── pytest.ini
-├── README.md
-├── postman_collection.json
-└── postman_environment.json
-Installation
-1. Clone Repository
-git clone <repository-url>
-cd staynest-pro
-2. Create Virtual Environment
+├── TEST_RESULTS.txt
+├── .env.example
+└── .gitignore
+4. Requirements
+Python 3.8+
+MySQL Server
+Git
+Virtual Environment
+5. Setup Instructions
+Clone Repository
+git clone https://github.com/Pradeepsai7781/StayNestPro.git
+cd StayNestPro
+Create Virtual Environment
+Windows:
+
 python -m venv venv
-Activate Environment
-Windows
-
 venv\Scripts\activate
-Linux/Mac
+Linux/Mac:
 
+python -m venv venv
 source venv/bin/activate
-3. Install Dependencies
+Install Dependencies
 pip install -r requirements.txt
-Environment Configuration
-Create a .env file using .env.example.
+6. Configure Environment Variables
+Create a .env file from .env.example.
 
 Example:
 
-DATABASE_URL=mysql+pymysql://username:password@localhost:3306/staynest_db
+DATABASE_URL=mysql+pymysql://username:password@localhost/staynest_db
 
 SECRET_KEY=your_secret_key
 
@@ -131,154 +150,163 @@ ACCESS_TOKEN_EXPIRE_MINUTES=30
 
 REFRESH_TOKEN_EXPIRE_DAYS=7
 
-STRIPE_SECRET_KEY=your_stripe_secret
+STRIPE_SECRET_KEY=your_stripe_key
 
 STRIPE_WEBHOOK_SECRET=your_webhook_secret
+Never upload real secrets to GitHub.
 
-UPLOAD_DIR=uploads
+7. Database Setup
+Create Database:
 
-OPENAI_API_KEY=your_ai_provider_key
-Database Setup
-Create Database
 CREATE DATABASE staynest_db;
-Run Migrations
+Apply Migrations:
+
 alembic upgrade head
-Check Migration History
-alembic history
-Running The Application
+Verify Migration Status:
+
+alembic current
+8. Running the Application
+Start FastAPI:
+
 uvicorn app.main:app --reload
-Application URL:
+Application:
 
-http://localhost:8000
-Swagger Documentation
-Swagger UI
+http://127.0.0.1:8000
+9. API Documentation
+Swagger UI:
 
-http://localhost:8000/docs
-ReDoc
+http://127.0.0.1:8000/docs
+ReDoc:
 
-http://localhost:8000/redoc
-OpenAPI Schema
+http://127.0.0.1:8000/redoc
+OpenAPI Schema:
 
-http://localhost:8000/openapi.json
-Authentication
-All protected APIs require JWT Bearer Token.
+http://127.0.0.1:8000/openapi.json
+10. Main API Modules
+Implemented Modules:
 
-Example Header:
+Authentication & RBAC
+Customer Profile Management
+Hotel Registration & Verification
+Hotel Profile Management
+Room Management
+Room Types
+Hotel Amenities
+Hotel Availability
+Hotel Search
+Advanced Filters
+Hotel Details
+Room Booking
+Guest Management
+Booking Management
+Payment Management
+Invoice Management
+Refund Management
+Coupons & Discounts
+Reviews & Ratings
+Wishlist Management
+AI Recommendations
+AI Travel Assistant
+AI Support Chatbot
+Notifications
+Messaging
+Housekeeping
+Staff Management
+Check-In / Check-Out
+Additional Services
+Room Service
+Analytics
+Reports
+Security Monitoring
+Loyalty & Rewards
+Location Services
+Dynamic Pricing
+Business Intelligence
+Platform Administration
+Total Modules Implemented: 50
 
-Authorization: Bearer <access_token>
-Use the Swagger "Authorize" button to test protected endpoints.
+11. Testing
+Swagger Testing
+All APIs tested using FastAPI Swagger UI.
 
-API Testing
-Swagger UI
-Validated for:
+Tested:
 
 Authentication
 CRUD Operations
-Role-Based Access Control
-Validation Errors
+Role Validation
 Booking Workflows
 Payment Workflows
-Refund Processing
-Filters & Pagination
-Postman
+Refund Workflows
+Dashboard APIs
+Analytics APIs
+Postman Testing
 Collection Included:
 
-StayNest Pro Backend API Tests
-Environment Variables:
+Postman/StayNest Pro Backend API Tests.postman_collection.json
+Environment Included:
 
-base_url
-access_token
-refresh_token
-customer_id
-hotel_id
-room_id
-booking_id
-payment_id
-Running Tests
-Execute test suite:
+Postman/StayNest Pro Local.postman_environment.json
+Automated Testing
+Run tests:
 
-pytest -v
-Example Result:
+pytest
+Result:
 
-===================================
-38 passed, 0 failed
-===================================
-Health Check
-Endpoint:
+38 Passed
+0 Failed
+12. Screenshots
+Project includes Swagger and Testing Screenshots:
 
-GET /health
-Response:
+Examples:
 
-{
-  "success": true,
-  "message": "Service healthy"
-}
-Role Permissions
-CUSTOMER
-Manage Profile
-Search Hotels
-Book Rooms
-Payments
-Reviews
-Wishlist
-HOTEL_OWNER
-Manage Hotels
-Manage Rooms
-View Revenue
-Manage Staff
-HOTEL_STAFF
-Housekeeping
-Check-In
-Check-Out
-Service Operations
-ADMIN
-User Management
-Hotel Approval
-Dashboard Access
+Authentication Login
+Customer Dashboard
+Room Management
+Booking Availability
+Reservation Calendar
+Payment Checkout
+Refund Records
+Business Intelligence
 Security Monitoring
-Platform Configuration
-Automated Testing Coverage
-Covered Areas:
+AI Customer Support
+AI Travel Assistant
+Hotel Moderation
+Pytest Results
+Location:
 
-Authentication
-Authorization
-Customer CRUD
-Hotel CRUD
-Room CRUD
-Booking Logic
-Availability Validation
-Payment Flow
-Refund Flow
-Report Generation
-Role-Based Access Control
-Input Validation
-Security Measures
+Screenshots/
+13. Security Features
 JWT Authentication
 Password Hashing
-Input Validation
-Rate Limiting
 RBAC Authorization
+Protected Routes
+Validation Using Pydantic
 Audit Logging
-Secure Environment Variables
-Stripe Webhook Verification
-Deliverables Included
-Complete FastAPI Source Code
-SQLAlchemy Models
-Alembic Migrations
-Swagger Documentation
-Postman Collection
-Postman Environment
-Pytest Test Suite
-Test Results
-Setup Documentation
-API Inventory
-.env.example
-Database Migration Instructions
-Known Limitations
-External AI service behavior depends on provider availability.
-Stripe operates in test mode for development/testing.
-Some third-party integrations may require provider credentials before production deployment.
-Author
-Developer: Ediga Venkata Sai Pradeep
+Security Monitoring
+Fraud Detection
+Environment-Based Secrets
+14. Test Results
+Pytest Results
 
-Project: StayNest Pro Backend Version: 1.0.0
+38 Passed
+0 Failed
+0 Errors
+
+Swagger Testing Completed
+Postman Testing Completed
+Additional details available in:
+
+TEST_RESULTS.txt
+15. Known Limitations
+Stripe runs in test mode.
+AI responses depend on configured providers.
+Production deployment requires secure credentials and infrastructure configuration.
+16. Author
+Ediga Venkata Sai Pradeep
+
+GitHub:
+
+https://github.com/Pradeepsai7781
+
+17. License
+This project was developed for educational, training, and backend development demonstration purposes.
