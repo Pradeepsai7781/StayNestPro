@@ -1,0 +1,10 @@
+Pytest Results
+
+38 Passed
+0 Failed
+0 Errors
+
+Swagger UI Testing: Completed
+Postman Testing: Completed
+
+Project Status: Ready for Submission

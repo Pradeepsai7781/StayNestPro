@@ -1,0 +1,320 @@
+{
+  "info": {
+    "_postman_id": "19cf515a-cf13-4c11-8e2b-7ac39244db46",
+    "name": "StayNest Pro Backend API Tests",
+    "description": "Submission-ready starter collection for the StayNest Pro FastAPI backend. Use only local test data and the accompanying Local environment.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "if (!pm.environment.get('base_url')) {",
+          "    pm.environment.set('base_url', 'http://127.0.0.1:8000');",
+          "}"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "pm.test('No server error', function () {",
+          "    pm.expect(pm.response.code).to.be.below(500);",
+          "});"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication and RBAC",
+      "item": [
+        {
+          "name": "Register customer",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"full_name\": \"{{customer_name}}\",\n  \"email\": \"{{customer_email}}\",\n  \"password\": \"{{customer_password}}\"\n}"},
+            "url": "{{base_url}}/auth/register"
+          }
+        },
+        {
+          "name": "Login and save tokens",
+          "event": [{"listen": "test", "script": {"type": "text/javascript", "exec": [
+            "pm.test('Login successful', function () { pm.response.to.have.status(200); });",
+            "const response = pm.response.json();",
+            "pm.environment.set('access_token', response.access_token);",
+            "pm.environment.set('refresh_token', response.refresh_token);"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"email\": \"{{customer_email}}\",\n  \"password\": \"{{customer_password}}\"\n}"},
+            "url": "{{base_url}}/auth/login"
+          }
+        },
+        {
+          "name": "Get current user and save customer ID",
+          "event": [{"listen": "test", "script": {"type": "text/javascript", "exec": [
+            "pm.test('Profile returned', function () { pm.response.to.have.status(200); });",
+            "const response = pm.response.json();",
+            "pm.environment.set('customer_id', String(response.id));"
+          ]}}],
+          "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}], "url": "{{base_url}}/auth/me"}
+        },
+        {
+          "name": "Refresh access token",
+          "event": [{"listen": "test", "script": {"type": "text/javascript", "exec": [
+            "pm.test('Refresh successful', function () { pm.response.to.have.status(200); });",
+            "const response = pm.response.json();",
+            "pm.environment.set('access_token', response.access_token);",
+            "pm.environment.set('refresh_token', response.refresh_token);"
+          ]}}],
+          "request": {"method": "POST", "header": [{"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}"}, "url": "{{base_url}}/auth/refresh"}
+        },
+        {
+          "name": "Admin users forbidden for customer",
+          "event": [{"listen": "test", "script": {"type": "text/javascript", "exec": ["pm.test('Customer is forbidden', function () { pm.response.to.have.status(403); });"]}}],
+          "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}], "url": "{{base_url}}/admin/users"}
+        }
+      ]
+    },
+    {
+      "name": "Customer Profiles",
+      "item": [
+        {
+          "name": "Get customer profile",
+          "event": [{"listen": "test", "script": {"type": "text/javascript", "exec": ["pm.test('Profile returned', function () { pm.response.to.have.status(200); });"]}}],
+          "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}], "url": "{{base_url}}/profile/me"}
+        },
+        {
+          "name": "Get travel preferences",
+          "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}], "url": "{{base_url}}/profile/me/preferences"}
+        }
+      ]
+    },
+    {
+      "name": "Hotel Registration and Verification",
+      "item": [
+        {
+          "name": "Create hotel and save hotel ID",
+          "event": [{"listen": "test", "script": {"type": "text/javascript", "exec": [
+            "pm.test('Hotel created', function () { pm.response.to.have.status(201); });",
+            "pm.environment.set('hotel_id', String(pm.response.json().id));"
+          ]}}],
+          "request": {"method": "POST", "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}, {"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\n  \"name\": \"Postman Demo Hotel\",\n  \"description\": \"Test hotel created through Postman\",\n  \"property_type\": \"HOTEL\",\n  \"address\": \"10 Test Street\",\n  \"city\": \"Bengaluru\",\n  \"state\": \"Karnataka\",\n  \"postal_code\": \"560001\",\n  \"country\": \"India\"\n}"}, "url": "{{base_url}}/hotels/"}
+        },
+        {
+          "name": "List pending hotels (admin)",
+          "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}], "url": "{{base_url}}/admin/hotels/pending"}
+        }
+      ]
+    },
+    {
+      "name": "Hotels, Rooms, and Amenities",
+      "item": [
+        {
+          "name": "List hotel rooms",
+          "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}], "url": "{{base_url}}/hotels/{{hotel_id}}/rooms"}
+        },
+        {
+          "name": "List amenities",
+          "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}], "url": "{{base_url}}/amenities"}
+        }
+      ]
+    },
+    {
+      "name": "Availability and Search",
+      "item": [
+        {
+          "name": "Search hotels by city",
+          "request": {"method": "GET", "url": "{{base_url}}/hotels/search?city=Bengaluru&page=1&page_size=10"}
+        },
+        {
+          "name": "Check room availability",
+          "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}], "url": "{{base_url}}/api/v1/reservations/availability?hotel_id={{hotel_id}}&check_in=2026-11-10&check_out=2026-11-12&guests=1"}
+        }
+      ]
+    },
+    {
+      "name": "Bookings and Guests",
+      "item": [
+        {
+          "name": "Get my reservations",
+          "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}], "url": "{{base_url}}/api/v1/reservations/my"}
+        },
+        {
+          "name": "Get guest history",
+          "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}], "url": "{{base_url}}/guests/history"}
+        }
+      ]
+    },
+    {
+      "name": "Payments, Invoices, and Refunds",
+      "item": [
+        {
+          "name": "Get my payments",
+          "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}], "url": "{{base_url}}/payments/my"}
+        },
+        {
+          "name": "Get my refunds",
+          "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}], "url": "{{base_url}}/api/v1/refunds/my"}
+        },
+        {
+          "name": "Get my invoices",
+          "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}], "url": "{{base_url}}/api/v1/invoices/my"}
+        }
+      ]
+    },
+    {
+      "name": "Coupons, Reviews, and Wishlists",
+      "item": [
+        {
+          "name": "List coupons",
+          "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}], "url": "{{base_url}}/api/v1/coupons"}
+        },
+        {
+          "name": "Get hotel rating",
+          "request": {"method": "GET", "url": "{{base_url}}/api/v1/reviews/hotels/{{hotel_id}}/rating"}
+        },
+        {
+          "name": "Get favorite hotels",
+          "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}], "url": "{{base_url}}/api/v1/wishlist/hotels"}
+        }
+      ]
+    },
+    {
+      "name": "AI Services",
+      "item": [
+        {
+          "name": "Hotel recommendations",
+          "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}], "url": "{{base_url}}/api/v1/recommendations?city=Bengaluru&budget=10000&limit=5"}
+        },
+        {
+          "name": "Travel assistant plan",
+          "request": {"method": "POST", "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}, {"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\n  \"budget\": 10000,\n  \"destination\": \"Bengaluru\",\n  \"start_date\": \"2026-11-10\",\n  \"end_date\": \"2026-11-12\",\n  \"preferences\": [\"Wi-Fi\", \"breakfast\"]\n}"}, "url": "{{base_url}}/api/v1/travel-assistant/plan"}
+        },
+        {
+          "name": "Support chatbot question",
+          "request": {"method": "POST", "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}, {"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\n  \"question\": \"What is the cancellation policy?\",\n  \"category\": \"cancellation\"\n}"}, "url": "{{base_url}}/api/v1/support/chat"}
+        }
+      ]
+    },
+    {
+      "name": "Notifications and Messaging",
+      "item": [
+        {
+          "name": "List notifications",
+          "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}], "url": "{{base_url}}/api/v1/notifications"}
+        },
+        {
+          "name": "List conversations",
+          "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}], "url": "{{base_url}}/api/v1/messaging/conversations"}
+        }
+      ]
+    },
+    {
+      "name": "Housekeeping and Staff",
+      "item": [
+        {
+          "name": "Set room housekeeping status",
+          "request": {"method": "PATCH", "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}, {"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\n  \"status\": \"CLEAN\"\n}"}, "url": "{{base_url}}/api/v1/housekeeping/rooms/{{room_id}}/status"}
+        },
+        {
+          "name": "List staff assigned to hotel",
+          "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}], "url": "{{base_url}}/api/v1/staff/hotels/{{hotel_id}}"}
+        }
+      ]
+    },
+    {
+      "name": "Check-In, Check-Out, and Services",
+      "item": [
+        {
+          "name": "Get reservation stay",
+          "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}], "url": "{{base_url}}/api/v1/reservations/{{booking_id}}/stay"}
+        },
+        {
+          "name": "List additional services",
+          "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}], "url": "{{base_url}}/api/v1/additional-services"}
+        }
+      ]
+    },
+    {
+      "name": "Analytics and Reports",
+      "item": [
+        {
+          "name": "Monthly revenue analytics",
+          "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}], "url": "{{base_url}}/api/v1/revenue-analytics/monthly?year=2026&month=10"}
+        },
+        {
+          "name": "Business intelligence summary",
+          "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}], "url": "{{base_url}}/api/v1/business-intelligence/monthly-summary?year=2026&month=10"}
+        }
+      ]
+    },
+    {
+      "name": "Subscriptions and Pricing",
+      "item": [
+        {
+          "name": "Get subscription plans",
+          "request": {"method": "GET", "url": "{{base_url}}/api/v1/hotel-subscriptions/plans"}
+        },
+        {
+          "name": "List dynamic pricing rules",
+          "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}], "url": "{{base_url}}/api/v1/dynamic-pricing/rules?room_id={{room_id}}"}
+        }
+      ]
+    },
+    {
+      "name": "Loyalty and Location Services",
+      "item": [
+        {
+          "name": "Get loyalty benefits",
+          "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}], "url": "{{base_url}}/api/v1/loyalty/benefits"}
+        },
+        {
+          "name": "Get hotel coordinates",
+          "request": {"method": "GET", "url": "{{base_url}}/api/v1/hotels/{{hotel_id}}/coordinates"}
+        }
+      ]
+    },
+    {
+      "name": "Financial Management",
+      "item": [
+        {
+          "name": "Get financial records",
+          "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}], "url": "{{base_url}}/api/v1/financial-management/records"}
+        },
+        {
+          "name": "Get settlements",
+          "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}], "url": "{{base_url}}/api/v1/financial-management/settlements"}
+        },
+        {
+          "name": "Get reconciliation records",
+          "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}], "url": "{{base_url}}/api/v1/financial-management/reconciliation"}
+        }
+      ]
+    },
+    {
+      "name": "Security and Administration",
+      "item": [
+        {
+          "name": "Run security scan",
+          "request": {"method": "POST", "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}], "url": "{{base_url}}/api/v1/security/scan"}
+        },
+        {
+          "name": "Get system integration status",
+          "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}], "url": "{{base_url}}/api/v1/system-settings/integration-status"}
+        },
+        {
+          "name": "Get administration overview",
+          "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}], "url": "{{base_url}}/api/v1/system-admin/overview"}
+        }
+      ]
+    }
+  ]
+}
